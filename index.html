@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Equirectangular projection demo – Leaflet</title>
+
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css"
+      integrity="sha512-xodZBNTC5n17Xt2atTPuE1HxjVMSvLVW9ocqUKLsCC5CXdbqCmblAshOMAS6/keqq/sMZMZ19scR4PsZChSR7A=="
+      crossorigin=""
+    />
+    <script
+      src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"
+      integrity="sha512-XQoYMqMTK8LvdxXYG3nZ448hOEQiglfqkJs1NOQV44cWnUrBc8PkAOcXy20w0vlaXaVUearIOBhiXZ5V3ynxwA=="
+      crossorigin=""
+    ></script>
+    <script
+      type="text/javascript"
+      src="https://unpkg.com/leaflet.vectorgrid@1.2.0"
+    ></script>
+  </head>
+  <body>
+    <div id="map" style="width: 90%; height: 90%; position: absolute"></div>
+    <script>
+      // define styling for layers within the vector tiles (names must match)
+      var vectorTileStyling = {
+        borders: {
+          weight: 1,
+          color: 'gray',
+          fillOpacity: 0.2,
+          opacity: 1
+        },
+        lakes: {
+          fill: true,
+          weight: 1,
+          fillColor: '#06cccc',
+          color: '#06cccc',
+          fillOpacity: 0.2,
+          opacity: 0.4
+        },
+        landuse: {
+          fill: true,
+          weight: 1,
+          fillColor: '#e5b404',
+          color: '#e5b404',
+          fillOpacity: 0.2,
+          opacity: 0.4
+        }
+      };
+
+      // give a url that serves tiles at 2x1 at zoom level 0 (i.e. compatible with L.CRS.EPSG4326)
+      var mapboxUrl =
+        'http://localhost:8989/maps/mapbox-gl-2x1/{z}/{x}/{y}.pbf';
+
+      var mapboxVectorTileOptions = {
+        rendererFactory: L.canvas.tile,
+        vectorTileLayerStyles: vectorTileStyling,
+      };
+
+      var mapboxPbfLayer = L.vectorGrid.protobuf(
+        mapboxUrl,
+        mapboxVectorTileOptions
+      );
+
+      var mymap = L.map('map', {
+        crs: L.CRS.EPSG4326,
+      }).setView([0, 0], 0);
+
+      L.tileLayer(
+        'https://wi.maptiles.arcgis.com/arcgis/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
+        {
+          maxZoom: 18,
+          id: 'basemap',
+          tileSize: 256,
+        }
+      ).addTo(mymap);
+
+      mapboxPbfLayer.addTo(mymap);
+    </script>
+  </body>
+</html>
